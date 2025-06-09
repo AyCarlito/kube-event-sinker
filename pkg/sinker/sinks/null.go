@@ -1,13 +1,13 @@
 package sinks
 
-// NullSink is a sink that does nothing.
-type NullSink struct{}
+// nullSink is a sink that does nothing.
+type nullSink struct{}
 
-// OnAdd does nothing with an Add event.
-func (n *NullSink) OnAdd(obj interface{}) {}
+// OnAdd handles Add events.
+func (n *nullSink) OnAdd(obj interface{}) {}
 
-// OnUpdate does nothing with an Update event.
-func (n *NullSink) OnUpdate(oldObj, newObj interface{}) {}
+// OnUpdate handles Update events.
+func (n *nullSink) OnUpdate(oldObj, newObj interface{}) {}
 
-// OnDelete does nothing with a Delete event.
-func (n *NullSink) OnDelete(obj interface{}) {}
+// OnDelete handles Delete events.
+func (n *nullSink) OnDelete(obj interface{}) {}

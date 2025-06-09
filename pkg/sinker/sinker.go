@@ -60,6 +60,14 @@ func NewSinker(ctx context.Context, kubeConfigPath, sinkName string) (*Sinker, e
 		DeleteFunc: sink.OnDelete,
 	})
 
+	// We always setup a metrics sink.
+	metricsSink := sinks.MetricsSink{}
+	eventsInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    metricsSink.OnAdd,
+		UpdateFunc: metricsSink.OnUpdate,
+		DeleteFunc: metricsSink.OnDelete,
+	})
+
 	return &Sinker{
 		ctx:       ctx,
 		clientset: clientset,

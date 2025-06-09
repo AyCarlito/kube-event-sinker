@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 
 	"github.com/AyCarlito/kube-event-sinker/pkg/logger"
@@ -12,12 +14,14 @@ import (
 )
 
 func init() {
+	rootCmd.PersistentFlags().StringVar(&metricsAddress, "metrics-bind-address", ":9111", "The address the metric endpoint binds to.")
 	rootCmd.PersistentFlags().StringVar(&kubeConfigPath, "kubeconfig", "", "Path to a kubeconfig file.")
 	rootCmd.PersistentFlags().StringVar(&sinkName, "sink", "null", "Sink that events should be pushed to.")
 }
 
 // CLI Flags
 var (
+	metricsAddress string
 	kubeConfigPath string
 	sinkName       string
 )
@@ -39,6 +43,16 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			panic(fmt.Errorf("failed to create new sinker: %v", err))
 		}
+
+		go func() {
+			// Metrics.
+			mux := http.NewServeMux()
+			mux.Handle("/metrics", promhttp.Handler())
+			err := http.ListenAndServe(metricsAddress, mux)
+			if err != nil {
+				panic(fmt.Errorf("failed to start metrics server: %v", err))
+			}
+		}()
 
 		return sinker.Start()
 	},
