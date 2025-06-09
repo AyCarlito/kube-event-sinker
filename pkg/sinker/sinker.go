@@ -16,6 +16,11 @@ import (
 	"github.com/AyCarlito/kube-event-sinker/pkg/sinker/sinks"
 )
 
+// resyncPeriod defines the time after which events in the local cache should be requeued.
+// The duration here is around 290 years.
+// It is intentionally high as the concept of requeing is made redundant by using the zeroOffsetSink.
+const resyncPeriod time.Duration = 1<<63 - 1
+
 // Sinker watches Kubernetes events and pushes them to a specified sink.
 type Sinker struct {
 	ctx       context.Context
@@ -53,8 +58,7 @@ func NewSinker(ctx context.Context, kubeConfigPath, sinkName string) (*Sinker, e
 
 	// Prefer use of informer factory to get a shared informer instead of getting an independant one.
 	// Reduces memory footprint and number of connections to server.
-	// TODO: Resync duration should come from CLI flag.
-	eventsInformer := informers.NewSharedInformerFactory(clientset, 1*time.Hour).Events().V1().Events()
+	eventsInformer := informers.NewSharedInformerFactory(clientset, resyncPeriod).Events().V1().Events()
 
 	// Add handlers for the events to the informer.
 	eventsInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
