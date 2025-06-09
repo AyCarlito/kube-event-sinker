@@ -53,6 +53,9 @@ func NewSinker(ctx context.Context, kubeConfigPath, sinkName string) (*Sinker, e
 		return nil, err
 	}
 
+	// Wrap the sink with a metricsSink to generate prometheus metrics for handled events.
+	sink = sinks.NewSinkWithMetrics(sink)
+
 	// Wrap the sink with a zeroOffsetSink to filter out events that are assumed to have been previously handled.
 	sink = sinks.NewSinkWithZeroOffset(sink)
 
@@ -65,14 +68,6 @@ func NewSinker(ctx context.Context, kubeConfigPath, sinkName string) (*Sinker, e
 		AddFunc:    sink.OnAdd,
 		UpdateFunc: sink.OnUpdate,
 		DeleteFunc: sink.OnDelete,
-	})
-
-	// We always setup a metrics sink.
-	metricsSink := sinks.MetricsSink{}
-	eventsInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    metricsSink.OnAdd,
-		UpdateFunc: metricsSink.OnUpdate,
-		DeleteFunc: metricsSink.OnDelete,
 	})
 
 	return &Sinker{

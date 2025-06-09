@@ -7,26 +7,32 @@ import (
 	"github.com/AyCarlito/kube-event-sinker/pkg/metrics"
 )
 
-// MetricsSink is a sink that generates prometheus metrics.
-type MetricsSink struct{}
+// metricsSink is a sink that generates prometheus metrics.
+// It acts as a wrapper around a provided Sink.
+type metricsSink struct {
+	sink Sink
+}
 
 // OnAdd handles Add events.
-func (m *MetricsSink) OnAdd(obj interface{}) {
+func (m *metricsSink) OnAdd(obj interface{}) {
 	m.handle(obj)
+	m.sink.OnAdd(obj)
 }
 
 // OnUpdate handles Update events.
-func (m *MetricsSink) OnUpdate(oldObj, newObj interface{}) {
+func (m *metricsSink) OnUpdate(oldObj, newObj interface{}) {
 	m.handle(newObj)
+	m.sink.OnUpdate(oldObj, newObj)
 }
 
 // OnDelete handles Delete events.
-func (m *MetricsSink) OnDelete(obj interface{}) {
+func (m *metricsSink) OnDelete(obj interface{}) {
 	m.handle(obj)
+	m.sink.OnDelete(obj)
 }
 
 // handle handles an event.
-func (m *MetricsSink) handle(obj interface{}) {
+func (m *metricsSink) handle(obj interface{}) {
 	event := obj.(*eventsv1.Event)
 	metrics.KubernetesEvents.With(prometheus.Labels{
 		"kind":      event.Regarding.Kind,
@@ -35,4 +41,9 @@ func (m *MetricsSink) handle(obj interface{}) {
 		"reason":    event.Reason,
 		"type":      event.Type,
 	}).Inc()
+}
+
+// NewSinkWithMetrics wraps a provided sink a *metricsSink.
+func NewSinkWithMetrics(sink Sink) Sink {
+	return &metricsSink{sink: sink}
 }
