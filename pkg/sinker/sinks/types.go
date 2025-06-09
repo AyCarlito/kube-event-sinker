@@ -3,7 +3,7 @@ package sinks
 import "fmt"
 
 const (
-	nullSink string = "null"
+	nullSinkName string = "null"
 )
 
 // Sink handles events.
@@ -16,11 +16,11 @@ type Sink interface {
 
 // NewSink returns the Sink corresponding to the provided sink name.
 func NewSink(name string) (Sink, error) {
-	// TODO: Metrics. The sink handlers should be wrapped.
+	// TODO: Should the metrics sink be a wrapper?
 	// TODO: Should also skip events from before the application started.
 	switch name {
-	case nullSink:
-		return &NullSink{}, nil
+	case nullSinkName:
+		return &nullSink{}, nil
 	default:
 		return nil, fmt.Errorf("unrecognised sink: %s", name)
 	}
