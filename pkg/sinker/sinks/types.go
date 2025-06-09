@@ -21,7 +21,6 @@ type Sink interface {
 // NewSink returns the Sink corresponding to the provided sink name.
 func NewSink(ctx context.Context, name string) (Sink, error) {
 	// TODO: Should the metrics sink be a wrapper?
-	// TODO: Should also skip events from before the application started.
 	switch name {
 	case nullSinkName:
 		return &nullSink{}, nil
