@@ -48,8 +48,8 @@ func NewSinker(ctx context.Context, kubeConfigPath, sinkName string) (*Sinker, e
 		return nil, err
 	}
 
-	// Wrap the sink with offsetSink to filter out events that are assumed to have been previously handled.
-	sink = sinks.NewSinkWithOffset(sink)
+	// Wrap the sink with a zeroOffsetSink to filter out events that are assumed to have been previously handled.
+	sink = sinks.NewSinkWithZeroOffset(sink)
 
 	// Prefer use of informer factory to get a shared informer instead of getting an independant one.
 	// Reduces memory footprint and number of connections to server.
