@@ -3,9 +3,10 @@ package sinks
 import (
 	"context"
 
-	"github.com/AyCarlito/kube-event-sinker/pkg/logger"
 	"go.uber.org/zap"
 	eventsv1 "k8s.io/api/events/v1"
+
+	"github.com/AyCarlito/kube-event-sinker/pkg/logger"
 )
 
 // zapSink is a sink that records events through a zap logger.
