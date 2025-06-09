@@ -13,11 +13,13 @@ import (
 
 func init() {
 	rootCmd.PersistentFlags().StringVar(&kubeConfigPath, "kubeconfig", "", "Path to a kubeconfig file.")
+	rootCmd.PersistentFlags().StringVar(&sinkName, "sink", "null", "Sink that events should be pushed to.")
 }
 
 // CLI Flags
 var (
 	kubeConfigPath string
+	sinkName       string
 )
 
 var rootCmd = &cobra.Command{
@@ -33,7 +35,7 @@ var rootCmd = &cobra.Command{
 		}
 		cmd.SetContext(logger.ContextWithLogger(cmd.Context(), log))
 
-		sinker, err := sinker.NewSinker(cmd.Context(), kubeConfigPath)
+		sinker, err := sinker.NewSinker(cmd.Context(), kubeConfigPath, sinkName)
 		if err != nil {
 			panic(fmt.Errorf("failed to create new sinker: %v", err))
 		}
