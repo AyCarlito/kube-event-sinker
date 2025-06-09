@@ -89,5 +89,18 @@ func (s *Sinker) Start() error {
 	}
 	log.Info("Cache synced")
 	<-s.ctx.Done()
+	s.shutdown()
 	return nil
+}
+
+// shutdown shuts down the Sinker.
+// It blocks until the underlying Informer has stopped.
+func (s *Sinker) shutdown() {
+	log := logger.LoggerFromContext(s.ctx)
+	log.Info("Shutting down sinker")
+	for {
+		if s.informer.Informer().IsStopped() {
+			return
+		}
+	}
 }
