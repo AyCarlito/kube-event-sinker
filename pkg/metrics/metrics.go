@@ -13,9 +13,9 @@ var KubernetesEvents = prometheus.NewCounterVec(
 		Help: "Total of Kubernetes events handled.",
 	},
 	[]string{
-		"regarding_kind",
-		"regarding_name",
-		"regarding_namespace",
+		"kind",
+		"name",
+		"namespace",
 		"reason",
 		"type",
 	},

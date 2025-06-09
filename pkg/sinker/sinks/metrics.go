@@ -12,27 +12,27 @@ type MetricsSink struct{}
 
 // OnAdd handles Add events.
 func (m *MetricsSink) OnAdd(obj interface{}) {
-	m.generate(obj)
+	m.handle(obj)
 }
 
 // OnUpdate handles Update events.
 func (m *MetricsSink) OnUpdate(oldObj, newObj interface{}) {
-	m.generate(newObj)
+	m.handle(newObj)
 }
 
 // OnDelete handles Delete events.
 func (m *MetricsSink) OnDelete(obj interface{}) {
-	m.generate(obj)
+	m.handle(obj)
 }
 
-// generate generates prometheus metrics.
-func (m *MetricsSink) generate(obj interface{}) {
+// handle handles an event.
+func (m *MetricsSink) handle(obj interface{}) {
 	event := obj.(*eventsv1.Event)
 	metrics.KubernetesEvents.With(prometheus.Labels{
-		"regarding_kind":      event.Regarding.Kind,
-		"regarding_name":      event.Regarding.Name,
-		"regarding_namespace": event.Regarding.Namespace,
-		"reason":              event.Reason,
-		"type":                event.Type,
+		"kind":      event.Regarding.Kind,
+		"name":      event.Regarding.Name,
+		"namespace": event.Regarding.Namespace,
+		"reason":    event.Reason,
+		"type":      event.Type,
 	}).Inc()
 }

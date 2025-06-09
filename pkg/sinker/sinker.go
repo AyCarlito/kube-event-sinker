@@ -43,7 +43,7 @@ func NewSinker(ctx context.Context, kubeConfigPath, sinkName string) (*Sinker, e
 
 	// Select the Sink by name.
 	// All Sinks provide a handler for the events.
-	sink, err := sinks.NewSink(sinkName)
+	sink, err := sinks.NewSink(ctx, sinkName)
 	if err != nil {
 		return nil, err
 	}
