@@ -1,0 +1,19 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/name: kube-event-sinker
+    release: metrics
+  name: kube-event-sinker
+spec:
+  endpoints:
+  - honorLabels: true
+    interval: {{ .Values.serviceMonitor.interval }}
+    path: /metrics
+    port: metrics
+    scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kube-event-sinker
+{{- end }}

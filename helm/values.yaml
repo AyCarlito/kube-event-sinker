@@ -1,0 +1,36 @@
+# Affinity for kube-event-sinker pod.
+affinity: {}
+
+# Image.
+image:
+  registry: ghcr.io
+  repository: aycarlito/kube-event-sinker
+  tag: "placeholder-overwritten-by-Makefile-do-not-check-in-changes"
+  pullSecrets: []
+
+# NodeSelector for kube-event-sinker pod.
+nodeSelector: {}
+
+# Resources for kube-event-sinker container.
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    cpu: 10m
+    memory: 64Mi
+
+# Prometheus Service Monitor.
+serviceMonitor:
+  # Create ServiceMonitor resource for scraping metrics.
+  enabled: true
+  # The interval at which metrics should be scraped.
+  interval: 20s
+  # The timeout after which the scrape is ended.
+  scrapeTimeout: 10s
+
+# Sink to push events to.
+sink: "null"
+
+# Tolerations for kube-event-sinker pod.
+tolerations: []

@@ -51,6 +51,14 @@ docker-run: ## Run the docker image.
 	-v ~/.kube/config:/.kube/config \
 	$(IMG) $(CMD) $(FLAGS) 
 
+.PHONY: helm-install
+helm-install: ## Install the helm chart.
+	helm upgrade --install kube-event-sinker -n kube-event-sinker helm/kube-event-sinker-$(VERSION).tgz
+
+.PHONY: helm-uninstall
+helm-uninstall: ## Uninstall the helm chart.
+	helm uninstall kube-event-sinker -n kube-event-sinker
+
 ##@ Build
 clean:
 	go clean -modcache
@@ -72,6 +80,14 @@ docker-build: ## Build docker image.
 .PHONY: docker-push
 docker-push: ## Push docker image.
 	docker push ${IMG}
+
+.PHONY: helm
+helm: ## Build helm chart.
+	sed -i "s/tag:.*/tag: $(VERSION)/" ./helm/values.yaml
+	sed -i "s/appVersion:.*/appVersion: \"$(VERSION)\"/" ./helm/Chart.yaml
+
+	helm lint ./helm
+	helm package ./helm --destination ./helm --version "$(VERSION)" --app-version "$(VERSION)"
 
 ##@ Build Dependencies
 ## Location to install dependencies to
