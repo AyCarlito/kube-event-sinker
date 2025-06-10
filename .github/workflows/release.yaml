@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
+      pull-requests: write
     
     steps:
     - name: Checkout repository
@@ -28,3 +29,10 @@ jobs:
         git add CHANGELOG
         git commit -m "chore: release notes"
         git push
+    
+    - name: Create pull request.
+      run: |
+        version=$(./bin/get_version.sh)
+        gh pr create -B main --title "chore: ${version} release notes" --body ""
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
