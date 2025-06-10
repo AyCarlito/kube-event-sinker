@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: kube-event-sinker
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+  name: kube-event-sinker
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kube-event-sinker
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: kube-event-sinker
+      labels:
+        app.kubernetes.io/name: kube-event-sinker
+        app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    spec:
+      containers:
+      - command:
+        - /kube-event-sinker
+        - --sink={{ .Values.sink }}
+        image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: IfNotPresent
+        name: kube-event-sinker
+        ports:
+        - name: metrics
+          containerPort: 9111
+          protocol: TCP
+        {{ include "kube-event-sinker.resources" . | indent 10 | trim }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+      enableServiceLinks: false
+      {{ include "kube-event-sinker.imagePullSecrets" . | indent 6 | trim }}
+      {{ include "kube-event-sinker.placement" . | indent 6 | trim }}
+      securityContext:
+        runAsNonRoot: true
+      serviceAccountName: kube-event-sinker
