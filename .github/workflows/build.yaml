@@ -31,13 +31,13 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    # - name: Build docker image
-    #   run: |
-    #     make docker-build 
+    - name: Build docker image
+      run: |
+        make docker-build 
 
-    # - name: Push docker image
-    #   run: |
-    #     make docker-push 
+    - name: Push docker image
+      run: |
+        make docker-push 
 
     - name: Build helm chart
       run: |
