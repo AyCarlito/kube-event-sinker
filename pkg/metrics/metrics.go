@@ -14,7 +14,6 @@ var KubernetesEvents = prometheus.NewCounterVec(
 	},
 	[]string{
 		"kind",
-		"name",
 		"namespace",
 		"reason",
 		"type",
