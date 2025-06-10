@@ -13,6 +13,8 @@ ifneq ($(IMAGE_REGISTRY),)
 IMG := $(IMAGE_REGISTRY)/$(IMG)
 endif
 
+CHART_REGISTRY ?=
+
 ##@ General
 
 # The help target prints out all targets with their descriptions organized
@@ -88,6 +90,10 @@ helm: ## Build helm chart.
 
 	helm lint ./helm
 	helm package ./helm --destination ./helm --version "$(VERSION)" --app-version "$(VERSION)"
+
+.PHONY: helm-push
+helm-push: ## Push helm chart.
+	helm push helm/kube-event-sinker-$(VERSION).tgz ${CHART_REGISTRY}
 
 ##@ Build Dependencies
 ## Location to install dependencies to

@@ -8,6 +8,7 @@ on:
 
 env:
   IMAGE_REGISTRY: ghcr.io
+  CHART_REGISTRY: oci://ghcr.io/aycarlito
 
 jobs:
   build:
@@ -37,3 +38,11 @@ jobs:
     - name: Push docker image
       run: |
         make docker-push 
+
+    - name: Build helm chart
+      run: |
+        make helm
+
+    - name: Push helm chart
+      run: |
+        make helm-push 
