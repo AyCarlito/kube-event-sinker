@@ -36,7 +36,6 @@ func (m *metricsSink) handle(obj interface{}) {
 	event := obj.(*eventsv1.Event)
 	metrics.KubernetesEvents.With(prometheus.Labels{
 		"kind":      event.Regarding.Kind,
-		"name":      event.Regarding.Name,
 		"namespace": event.Regarding.Namespace,
 		"reason":    event.Reason,
 		"type":      event.Type,
