@@ -1,0 +1,30 @@
+name: release
+
+on:
+  workflow_dispatch:
+    
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # fetch full history
+        filter: tree:0
+
+    - name: Create release branch.
+      run: |
+        make create-release-branch
+
+    - name: Create release notes.
+      run: |
+        make create-release-notes
+        git config user.name 'github-actions[bot]'
+        git config user.email 'github-actions[bot]@users.noreply.github.com'
+        git add CHANGELOG
+        git commit -m "chore: release notes"
+        git push
