@@ -33,6 +33,6 @@ jobs:
     - name: Create pull request.
       run: |
         version=$(./bin/get_version.sh)
-        gh pr create -B main --title "chore: ${version} release notes" --body ""
+        gh pr create -B main --title "chore: v${version} release notes" --body ""
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
