@@ -35,10 +35,9 @@ func (m *metricsSink) OnDelete(obj interface{}) {
 func (m *metricsSink) handle(obj interface{}) {
 	event := obj.(*eventsv1.Event)
 	metrics.KubernetesEvents.With(prometheus.Labels{
-		"kind":      event.Regarding.Kind,
-		"namespace": event.Regarding.Namespace,
-		"reason":    event.Reason,
-		"type":      event.Type,
+		"kind":   event.Regarding.Kind,
+		"reason": event.Reason,
+		"type":   event.Type,
 	}).Inc()
 }
 
