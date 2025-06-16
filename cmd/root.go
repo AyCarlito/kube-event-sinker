@@ -65,51 +65,33 @@ func Execute() {
 	ctx, cxl := context.WithCancel(context.Background())
 	defer cxl()
 
-	sigChan := make(chan os.Signal, 1)
+	// Following a signal, cancel the context to initiate graceful shutdown.
+	// This produces one of two desired behaviours:
+	// 1) Exit after shutdown is complete.
+	// 2) Exit on a subsequent signal.
+	sigChan := make(chan os.Signal, 2)
 	signal.Notify(sigChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	go func() {
+		<-sigChan
+		cxl()
+		<-sigChan
+		os.Exit(-1)
+	}()
 
-	errChan := make(chan error)
-	go func(c chan<- error) {
-		c <- rootCmd.ExecuteContext(ctx)
-	}(errChan)
-
-	exitCode := 0
-	signalCaught := false
-
-outer:
-	for {
-		select {
-		case err := <-errChan:
-			if err != nil {
-				exitCode = 1
-				// By default, cobra prints the error and usage string on every error.
-				// We only desire this behaviour in the case where command line parsing fails e.g. unknown command or flag.
-				// Cobra does not provide a mechanism for achieving this fine grain control, so we implement our own.
-				if strings.Contains(err.Error(), "command") || strings.Contains(err.Error(), "flag") {
-					// Parsing errors are printed along with the usage string.
-					fmt.Println(err.Error())
-					fmt.Println(rootCmd.UsageString())
-				} else {
-					// Other errors logged, no usage string displayed.
-					log := logger.LoggerFromContext(rootCmd.Context())
-					log.Error(err.Error())
-				}
-			}
-			break outer
-
-		case <-sigChan:
-			// Cancel context for graceful shutdown.
-			cxl()
-			exitCode = -1
-
-			// This check results in one of two desired behaviours:
-			// 1) Following a signal, we only exit after a subsequent signal.
-			// 2) Following a signal, we only exit after a notification on the error channel i.e. shutdown is complete.
-			if signalCaught {
-				break outer
-			}
-			signalCaught = true
+	err := rootCmd.ExecuteContext(ctx)
+	if err != nil {
+		// By default, cobra prints the error and usage string on every error.
+		// We only desire this behaviour in the case where command line parsing fails e.g. unknown command or flag.
+		// Cobra does not provide a mechanism for achieving this fine grain control, so we implement our own.
+		if strings.Contains(err.Error(), "command") || strings.Contains(err.Error(), "flag") {
+			// Parsing errors are printed along with the usage string.
+			fmt.Println(err.Error())
+			fmt.Println(rootCmd.UsageString())
+		} else {
+			// Other errors logged, no usage string displayed.
+			log := logger.LoggerFromContext(rootCmd.Context())
+			log.Error(err.Error())
 		}
+		os.Exit(1)
 	}
-	os.Exit(exitCode)
 }
