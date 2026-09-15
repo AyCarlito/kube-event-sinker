@@ -36,6 +36,7 @@ func (z *zapSink) handle(obj interface{}) {
 		zap.String("kind", event.Regarding.Kind),
 		zap.String("name", event.Regarding.Name),
 		zap.String("namespace", event.Regarding.Namespace),
+		zap.String("note", event.Note),
 		zap.String("reason", event.Reason),
 		zap.String("type", event.Type),
 	)
